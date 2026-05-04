@@ -1,0 +1,253 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Truwell API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: orders
+    description: Order operations
+  - name: waitlist
+    description: Waitlist signup operations
+  - name: products
+    description: Product operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List all products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /orders:
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Place a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderBody"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /waitlist:
+    post:
+      operationId: joinWaitlist
+      tags: [waitlist]
+      summary: Sign up for product waitlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WaitlistSignupBody"
+      responses:
+        "201":
+          description: Signed up successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaitlistEntry"
+        "409":
+          description: Email already on waitlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        tagline:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        originalPrice:
+          type: number
+        quantity:
+          type: string
+        fibre:
+          type: string
+        sugar:
+          type: string
+        calories:
+          type: string
+        inStock:
+          type: boolean
+        imageUrl:
+          type: string
+        badge:
+          type: string
+      required:
+        - id
+        - name
+        - tagline
+        - description
+        - price
+        - quantity
+        - inStock
+
+    CreateOrderBody:
+      type: object
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        pincode:
+          type: string
+      required:
+        - productId
+        - quantity
+        - name
+        - email
+        - phone
+        - address
+        - city
+        - pincode
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        productId:
+          type: integer
+        quantity:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        pincode:
+          type: string
+        totalAmount:
+          type: number
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - productId
+        - quantity
+        - name
+        - email
+        - totalAmount
+        - status
+        - createdAt
+
+    WaitlistSignupBody:
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+        product:
+          type: string
+      required:
+        - email
+        - name
+        - product
+
+    WaitlistEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        product:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - email
+        - name
+        - product
+        - createdAt
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

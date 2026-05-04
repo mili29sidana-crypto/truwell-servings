@@ -1,0 +1,4 @@
+# Ignore heavy build tools and dependencies
+.yarn/unplugged/
+.next/
+node_modules/
